@@ -7,6 +7,7 @@ Game::Game()
 	blocks = getAllBlocks();
 	currentBlock = getRandomBLock();
 	nextBlock = getRandomBLock();
+	GameOver = false;
 
 }
 
@@ -14,10 +15,13 @@ void Game::Run()
 {
 	BeginDrawing();
 	ClearBackground(BLACK);
-	UserInput();
-	if (timer(0.2))
+	handleUserInput();
+	if (!GameOver)
 	{
-		MoveBlockDown();
+		if (timer(0.1))
+		{
+			MoveBlockDown();
+		}
 	}
 	draw();
 	EndDrawing();
@@ -60,8 +64,13 @@ void Game::lockBlock()
 	{
 		Grid.Grid[t.row][t.column] = currentBlock.id;
 	}
+
 	currentBlock = nextBlock;
+	if(blockFits() == false) {
+		GameOver = true;
+	}
 	nextBlock = getRandomBLock();
+	Grid.clearFullRows();
 }
 
 bool Game::blockFits()
@@ -77,15 +86,30 @@ bool Game::blockFits()
 	return true;
 }
 
-void Game::UserInput()
+void Game::reset()
 {
+	Grid.reset();
+	blocks = getAllBlocks();
+	currentBlock = getRandomBLock();
+	nextBlock = getRandomBLock();
+}
+
+void Game::handleUserInput()
+{
+	float keyDelay = 0.08;
+	int keyPressed = GetKeyPressed();
+	if (GameOver && keyPressed != 0)
+	{
+		GameOver = false;
+		reset();
+	}
 	if (IsKeyDown(KEY_LEFT)) {
 		currentBlock.Move(0, -1);
 		if (isBlockOutside() || !blockFits())
 		{
 			currentBlock.Move(0, 1);
 		}
-		WaitTime(0.08);
+		WaitTime(keyDelay);
 	}
 	if (IsKeyDown(KEY_RIGHT)) {
 		currentBlock.Move(0, 1);		
@@ -93,15 +117,15 @@ void Game::UserInput()
 		{
 			currentBlock.Move(0, -1);
 		}
-		WaitTime(0.08);
+		WaitTime(keyDelay);
 	}
 	if (IsKeyDown(KEY_DOWN)) {
 		currentBlock.Move(1, 0);
 		if (isBlockOutside() || !blockFits())
 		{
-			currentBlock.Move(-1, 0);
+			currentBlock.Move(-1, 0);	
 		}
-		WaitTime(0.08);
+		WaitTime(keyDelay);
 	}
 	if (IsKeyPressed(KEY_UP))
 	{

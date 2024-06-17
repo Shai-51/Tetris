@@ -15,14 +15,13 @@ class Game
 public: 
 	Game();
 	void Run();
+private:
 	grid Grid;
 	std::vector<block> getAllBlocks();
 	void draw();
 	bool timer(double interval);
-	void UserInput();
+	void handleUserInput();
 	void MoveBlockDown();
-
-private:
 	std::vector<block> blocks;
 	block getRandomBLock();
 	block currentBlock;
@@ -31,5 +30,7 @@ private:
 	double lastUpdateTime = 0;
 	void lockBlock();
 	bool blockFits();
+	bool GameOver;
+	void reset();
 };
 
